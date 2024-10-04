@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="../build/Ecstasy_Jewels_API.props" />
+</Project>
