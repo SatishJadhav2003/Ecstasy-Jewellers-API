@@ -2,7 +2,8 @@ namespace ECSTASYJEWELS.Models
 {
     public class EJ_Banner
     {
-       public int Banner_ID {get;set;} 
+       public decimal Banner_ID {get;set;} 
+       public decimal Category_ID {get;set;} 
        public string Banner_Name {get;set;} ="";
        public string Banner_Image {get;set;} ="";
        public bool Is_Active {get;set;} 
