@@ -73,7 +73,7 @@ namespace ECSTASYJEWELS.Controllers
                 {
                     await conn.OpenAsync();
                     SqlCommand cmd = new SqlCommand(
-                        "SELECT Banner_ID, Category_ID, Banner_Name, Banner_Image FROM EJ_Banner WHERE Is_Active = 1",
+                        "SELECT Banner_ID, Category_ID, Banner_Name,Banner_Action_Name, Banner_Image FROM EJ_Banner WHERE Is_Active = 1",
                         conn);
 
                     using (var reader = await cmd.ExecuteReaderAsync())
@@ -86,6 +86,7 @@ namespace ECSTASYJEWELS.Controllers
                                 Category_ID = reader["Category_ID"] != DBNull.Value ? (decimal)reader["Category_ID"] : 0,
                                 Banner_Name = reader["Banner_Name"] != DBNull.Value ? reader["Banner_Name"].ToString() : string.Empty,
                                 Banner_Image = reader["Banner_Image"] != DBNull.Value ? reader["Banner_Image"].ToString() : string.Empty,
+                                Banner_Action_Name = reader["Banner_Action_Name"] != DBNull.Value ? reader["Banner_Action_Name"].ToString() : string.Empty,
                             });
                         }
                     }
