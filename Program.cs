@@ -1,7 +1,20 @@
 
+using ECSTASYJEWELS;
+using ECSTASYJEWELS.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container
+
+// 1. Registaring repos
+builder.Services.AddSingleton<ProductRepository>(sp =>
+    new ProductRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
+builder.Services.AddSingleton<CategoryRepository>(sp =>
+    new CategoryRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
+builder.Services.AddSingleton<BannerRepository>(sp =>
+    new BannerRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
 
 
 // 2. Register Controllers and JSON Serialization options
