@@ -11,26 +11,25 @@ namespace ECSTASYJEWELS.Data
             _connectionString = connectionString;
         }
 
-        public async Task<IEnumerable<EJ_Banner>> GetAllActiveBanners()
+        public async Task<IEnumerable<Banner>> GetAllActiveBanners()
         {
-            var banners = new List<EJ_Banner>();
+            var banners = new List<Banner>();
             try
             {
                 using (var conn = new SqlConnection(_connectionString))
                 {
                     await conn.OpenAsync();
-                    var command = new SqlCommand("SELECT Banner_ID, Category_ID, Banner_Name,Banner_Action_Name, Banner_Image FROM EJ_Banner WHERE Is_Active = 1", conn);
+                    var command = new SqlCommand("SELECT Banner_ID, Category_ID, Banner_Name, Banner_Image FROM Banner WHERE Is_Active = 1", conn);
                     using (var reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
-                            banners.Add(new EJ_Banner
+                            banners.Add(new Banner
                             {
                                 Banner_ID = (decimal)reader["Banner_ID"],
                                 Category_ID = (decimal)reader["Category_ID"],
                                 Banner_Name = reader["Banner_Name"].ToString() ?? "",
                                 Banner_Image = reader["Banner_Image"].ToString() ?? "",
-                                Banner_Action_Name = reader["Banner_Action_Name"].ToString() ?? "",
                             });
                         }
                     }
