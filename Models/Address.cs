@@ -10,7 +10,7 @@ namespace ECSTASYJEWELS.Models
         public string City { get; set; } = string.Empty;
         public string State { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
-        public string Postal_Code { get; set; } = string.Empty;
+        public int Postal_Code { get; set; }
         public bool Is_Default { get; set; }
         public DateTime Date_Added { get; set; }
     }

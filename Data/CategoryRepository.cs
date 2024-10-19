@@ -28,7 +28,7 @@ namespace ECSTASYJEWELS
                         {
                             category.Add(new Category
                             {
-                                Category_ID = (decimal)reader["Category_ID"],
+                                Category_ID = (int)reader["Category_ID"],
                                 Category_Name = reader["Category_Name"].ToString()??"",
                                 Category_Image = reader["Category_Image"].ToString() ??""
                             });

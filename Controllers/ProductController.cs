@@ -18,7 +18,21 @@ namespace ECSTASYJEWELS.Controllers
             _repository = repository;
         }
 
-        [HttpGet("{Category_ID}")]
+        [HttpGet("{Product_ID}")]
+        public async Task<ActionResult<IEnumerable<ProductData[]>>> GetProductByID(decimal Product_ID)
+        {
+            try
+            {
+                var products = await _repository.GetProductById(Product_ID);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Internal server error
+            }
+        }
+
+        [HttpGet("ByCatgory/{Category_ID}")]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts(decimal Category_ID)
         {
             try
@@ -31,6 +45,8 @@ namespace ECSTASYJEWELS.Controllers
                 return StatusCode(500, ex.Message); // Internal server error
             }
         }
+
+        
     }
 
 

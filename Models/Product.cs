@@ -9,7 +9,6 @@ namespace ECSTASYJEWELS.Models
         public decimal Price { get; set; }
         public int Stock_Quantity { get; set; }
         public decimal Weight { get; set; }
-        public string Dimensions { get; set; } = string.Empty;
         public string Product_Image { get; set; } = string.Empty;
         
         public bool Is_Active { get; set; }
