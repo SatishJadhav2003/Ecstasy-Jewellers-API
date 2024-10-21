@@ -25,6 +25,10 @@ builder.Services.AddSingleton<ProductImagesRepository>(sp =>
     new ProductImagesRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
 
+builder.Services.AddSingleton<CartRepository>(sp =>
+    new CartRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
+
 builder.Services.AddScoped<TokenService>();
 
 // 2. Register Controllers and JSON Serialization options

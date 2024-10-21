@@ -1,5 +1,4 @@
-// Controllers/CategoryController.cs
-using System.Data.SqlClient;
+
 using ECSTASYJEWELS.Models;
 using Microsoft.AspNetCore.Mvc;
 
