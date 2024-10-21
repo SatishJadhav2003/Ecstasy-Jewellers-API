@@ -21,6 +21,9 @@ builder.Services.AddSingleton<BannerRepository>(sp =>
 builder.Services.AddSingleton<UserRepository>(sp =>
     new UserRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
+builder.Services.AddSingleton<ProductImagesRepository>(sp =>
+    new ProductImagesRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
 
 builder.Services.AddScoped<TokenService>();
 
