@@ -1,6 +1,6 @@
 namespace ECSTASYJEWELS.Models
 {
-    public class Wishlists
+    public class Wishlist
     {
         public int Wishlist_ID { get; set; }
         public int User_ID { get; set; }

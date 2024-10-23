@@ -29,6 +29,11 @@ builder.Services.AddSingleton<CartRepository>(sp =>
     new CartRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
 
+builder.Services.AddSingleton<WishlistRepository>(sp =>
+    new WishlistRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
+
+
 builder.Services.AddScoped<TokenService>();
 
 // 2. Register Controllers and JSON Serialization options
