@@ -1,9 +1,11 @@
 namespace ECSTASYJEWELS.Models
 {
-    public class Addresses
+    public class Address
     {
         public int Address_ID { get; set; }
         public int User_ID { get; set; }
+        public decimal Mobile { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string Address_Type { get; set; } = string.Empty;
         public string Address_Line1 { get; set; } = string.Empty;
         public string Address_Line2 { get; set; } = string.Empty;

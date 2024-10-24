@@ -1,6 +1,6 @@
 namespace ECSTASYJEWELS.Models
 {
-    public class Orders
+    public class Order
     {
         public int Order_ID { get; set; }
         public int Address_ID { get; set; }

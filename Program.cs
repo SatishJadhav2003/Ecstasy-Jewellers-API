@@ -32,6 +32,12 @@ builder.Services.AddSingleton<CartRepository>(sp =>
 builder.Services.AddSingleton<WishlistRepository>(sp =>
     new WishlistRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
+builder.Services.AddSingleton<AddressRepository>(sp =>
+    new AddressRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
+builder.Services.AddSingleton<OrderRepository>(sp =>
+    new OrderRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
 
 
 builder.Services.AddScoped<TokenService>();

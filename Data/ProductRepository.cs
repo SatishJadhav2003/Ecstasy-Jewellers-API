@@ -64,7 +64,9 @@ namespace ECSTASYJEWELS.Data
                     await conn.OpenAsync();
                     var command = new SqlCommand(
                         "SELECT PROD.Product_ID, PROD.Category_ID, PROD.Product_Name, PROD.Description, PROD.Price, PROD.Weight, PROD.Stock_Quantity, " +
-                        "DIM.Dimension_ID, DIM.Title, DIM.Dim_Desc FROM Products AS PROD " +  
+                        "DIM.Dimension_ID, DIM.Title, DIM.Dim_Desc, " +  
+                        "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = PROD.Product_ID AND img.Is_Primary = 1) as Product_Image "+
+                        "FROM Products AS PROD "+
                         "LEFT JOIN Dimensions as DIM ON DIM.Product_ID = PROD.Product_ID " +
                         "WHERE PROD.Is_Active = 1 AND PROD.Product_ID = @Product_ID", conn); 
 
@@ -80,6 +82,7 @@ namespace ECSTASYJEWELS.Data
                                 Category_ID = (int)reader["Category_ID"],
                                 Dimension_ID = reader["Dimension_ID"] != DBNull.Value ? (int)reader["Dimension_ID"] : 0,  // Handle nullable values
                                 Product_Name = reader["Product_Name"].ToString() ?? "",
+                                Product_Image = reader["Product_Image"].ToString() ?? "",
                                 Description = reader["Description"].ToString() ?? "",
                                 Price = (decimal)reader["Price"],
                                 Weight = (decimal)reader["Weight"],
