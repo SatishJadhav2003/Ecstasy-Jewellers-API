@@ -38,6 +38,9 @@ builder.Services.AddSingleton<AddressRepository>(sp =>
 builder.Services.AddSingleton<OrderRepository>(sp =>
     new OrderRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
+builder.Services.AddSingleton<WatchlistRepository>(sp =>
+    new WatchlistRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
 
 
 builder.Services.AddScoped<TokenService>();
