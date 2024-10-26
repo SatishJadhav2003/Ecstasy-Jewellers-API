@@ -14,6 +14,7 @@ namespace ECSTASYJEWELS.Models
         public string Country { get; set; } = string.Empty;
         public int Postal_Code { get; set; }
         public bool Is_Default { get; set; }
+        public bool Is_Deleted { get; set; }
         public DateTime Date_Added { get; set; }
     }
 }

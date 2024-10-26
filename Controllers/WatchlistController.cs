@@ -18,7 +18,7 @@ namespace ECSTASYJEWELS.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<Category>>> AddtoWatchlist(Watchlist data)
+        public async Task<ActionResult<IEnumerable<Watchlist>>> AddtoWatchlist(Watchlist data)
         {
             try
             {
