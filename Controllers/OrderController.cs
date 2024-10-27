@@ -51,6 +51,20 @@ namespace ECSTASYJEWELS.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpGet("{User_ID}")]
+        public async Task<ActionResult<IEnumerable<OrderInputOutput[]>>> GetOrders(decimal User_ID)
+        {
+            try
+            {
+                var products = await _repository.GetUserOrderItems(User_ID);
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Internal server error
+            }
+        }
     }
 
     public class OrderDto
