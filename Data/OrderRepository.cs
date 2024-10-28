@@ -140,13 +140,55 @@ namespace ECSTASYJEWELS
                 {
                     await conn.OpenAsync();
 
+                    // Updated SQL query
                     var query = @"
-                                select ord.Order_ID,ord.Payment_Status,ord.Total_Amount,oi.Quantity,oi.Product_ID,prod.Product_Name,prod.Description,oi.Unit_Price,os.Status,os.Status_TimeStamp, 
-                                (SELECT Image_URL FROM Product_Images WHERE Product_Images.Product_ID = oi.Product_ID AND Product_Images.Is_Primary = 1) AS Product_Image 
-                                from Orders ord 
-                                inner join Order_Items oi on oi.Order_ID = ord.Order_ID 
-                                INNER join Products prod on prod.Product_ID =oi.Product_ID
-                                inner JOIN Order_Status os on os.Order_ID=ord.Order_ID where ord.User_ID=@User_ID order by os.Status_TimeStamp DESC";
+                SELECT
+                    ord.Order_ID,
+                    ord.Payment_Status,
+                    ord.Total_Amount,
+                    oi.Quantity,
+                    oi.Product_ID,
+                    prod.Product_Name,
+                    prod.[Description],
+                    oi.Unit_Price,
+                    pi.Image_URL AS Product_Image,
+                    addr.City AS City_Name,
+                    
+                    CASE 
+                        WHEN MAX(CASE WHEN os.Status = 'Delivered' THEN 1 ELSE 0 END) = 1 THEN 'True'
+                        ELSE 'False'
+                    END AS Is_Delivered,
+                    
+                    MAX(CASE WHEN os.Status = 'Delivered' THEN os.Status_Timestamp END) AS Delivery_Date,
+                    MAX(CASE WHEN os.Status = 'Placed' THEN os.Status_Timestamp END) AS Order_Placed_Date
+
+                FROM
+                    Orders ord
+                INNER JOIN 
+                    Order_Items oi ON oi.Order_ID = ord.Order_ID
+                INNER JOIN 
+                    Products prod ON prod.Product_ID = oi.Product_ID
+                INNER JOIN 
+                    Product_Images pi ON pi.Product_ID = oi.Product_ID AND pi.Is_Primary = 1
+                LEFT JOIN 
+                    Order_Status os ON os.Order_ID = ord.Order_ID
+                INNER JOIN 
+                    Addresses addr ON addr.Address_ID = ord.Address_ID
+                
+                WHERE
+                    ord.User_ID = @User_ID
+                
+                GROUP BY
+                    ord.Order_ID, 
+                    ord.Payment_Status,
+                    ord.Total_Amount,
+                    oi.Quantity,
+                    oi.Product_ID,
+                    prod.Product_Name,
+                    prod.[Description],
+                    oi.Unit_Price,
+                    pi.Image_URL,
+                    addr.City";
 
                     using (var command = new SqlCommand(query, conn))
                     {
@@ -161,14 +203,18 @@ namespace ECSTASYJEWELS
                                     Order_ID = (int)reader["Order_ID"],
                                     Product_ID = (int)reader["Product_ID"],
                                     Quantity = (int)reader["Quantity"],
-                                    Payment_Status = reader["Payment_Status"].ToString()??"",
-                                    Product_Name = reader["Product_Name"].ToString()??"",
-                                    Description = reader["Description"].ToString()??"",
+                                    Payment_Status = reader["Payment_Status"].ToString() ?? "",
+                                    Product_Name = reader["Product_Name"].ToString() ?? "",
+                                    Description = reader["Description"].ToString() ?? "",
                                     Total_Amount = (decimal)reader["Total_Amount"],
                                     Unit_Price = (decimal)reader["Unit_Price"],
                                     Product_Image = reader["Product_Image"].ToString() ?? "",
-                                    Status = reader["Status"].ToString() ?? "",
-                                    Status_TimeStamp = (DateTime)reader["Status_TimeStamp"],
+                                    City_Name = reader["City_Name"].ToString() ?? "",
+
+                                    // Is_Delivered and Date fields
+                                    Is_Delivered = reader["Is_Delivered"].ToString() == "True",
+                                    Delivery_Date = reader["Delivery_Date"] != DBNull.Value ? (DateTime?)reader["Delivery_Date"] : null,
+                                    Order_Placed_Date = reader["Order_Placed_Date"] != DBNull.Value ? (DateTime?)reader["Order_Placed_Date"] : null,
                                 });
                             }
                         }
@@ -188,7 +234,6 @@ namespace ECSTASYJEWELS
 
             return orderItems;
         }
-
         public async Task<bool> RemoveFromOrder(int Order_ID)
         {
             bool isDeleted = false;  // This will store the result of the deletion (true if successful)
@@ -229,28 +274,117 @@ namespace ECSTASYJEWELS
         }
 
 
+        public async Task<IEnumerable<Order_Description>> GetOrderDescription(int Order_ID)
+        {
+            var orderDescriptions = new List<Order_Description>();
+
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+
+                    // New SQL query to get order description details
+                    var query = @"
+                SELECT 
+                    pi.Image_URL AS Product_Image,
+                    os.[Status],
+                    os.Status_Timestamp,
+                    os.[Location],
+                    prod.Product_Name,
+                    prod.[Description],
+                    ord.Total_Amount,
+                    oi.Unit_Price,
+                    oi.Quantity
+                FROM 
+                    Orders ord
+                INNER JOIN 
+                    Order_Items oi ON oi.Order_ID = ord.Order_ID
+                INNER JOIN 
+                    Order_Status os ON os.Order_ID = ord.Order_ID
+                INNER JOIN 
+                    Products prod ON prod.Product_ID = oi.Product_ID
+                INNER JOIN 
+                    Product_Images pi ON pi.Product_ID = oi.Product_ID
+                WHERE 
+                    pi.Is_Primary = 1 AND ord.Order_ID = @Order_ID
+                ORDER BY 
+                    os.Status_Timestamp DESC";
+
+                    using (var command = new SqlCommand(query, conn))
+                    {
+                        command.Parameters.AddWithValue("@Order_ID", Order_ID);
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                orderDescriptions.Add(new Order_Description
+                                {
+                                    Order_ID = Order_ID,
+                                    Product_Image = reader["Product_Image"].ToString() ?? "",
+                                    Status = reader["Status"].ToString() ?? "",
+                                    Status_Timestamp = (DateTime)reader["Status_Timestamp"],
+                                    Location = reader["Location"].ToString() ?? "",
+                                    Product_Name = reader["Product_Name"].ToString() ?? "",
+                                    Description = reader["Description"].ToString() ?? "",
+                                    Total_Amount = (decimal)reader["Total_Amount"],
+                                    Unit_Price = (decimal)reader["Unit_Price"],
+                                    Quantity = (int)reader["Quantity"]
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Log exception (consider using a logging framework)
+                throw new Exception("Database error occurred while retrieving order descriptions." + ex);
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                throw new Exception("An error occurred while retrieving order descriptions." + ex);
+            }
+
+            return orderDescriptions;
+        }
+
     }
+
 
     public class OrderInputOutput
     {
         public int Order_ID { get; set; }
-        public int Address_ID { get; set; }
-        public int User_ID { get; set; }
-        public DateTime Order_Date { get; set; }
-        public string Status { get; set; } = string.Empty;
-        public decimal Total_Amount { get; set; }
-        public string Shipping_Address { get; set; } = string.Empty;
-        public string Billing_Address { get; set; } = string.Empty;
-        public string Payment_Status { get; set; } = string.Empty;
-        public string Product_Name { get; set; } = string.Empty;
-        public string Product_Image { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public int Order_Item_ID { get; set; }
         public int Product_ID { get; set; }
         public int Quantity { get; set; }
+        public string Payment_Status { get; set; } = "";
+        public string Product_Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Total_Amount { get; set; }
         public decimal Unit_Price { get; set; }
-        public decimal Total_Price => Quantity * Unit_Price;
-        public DateTime Status_TimeStamp { get; set; }
+        public string Product_Image { get; set; } = "";
+        public string City_Name { get; set; } = ""; // New field for City
 
+        public bool Is_Delivered { get; set; }  // New field for delivery status
+        public DateTime? Delivery_Date { get; set; }  // New field for Delivery date
+        public DateTime? Order_Placed_Date { get; set; }  // New field for Order placed date
     }
+
+    public class Order_Description
+    {
+        public int Order_ID {get;set;}
+        public string Product_Image { get; set; } = "";
+        public string Status { get; set; } = "";
+        public DateTime Status_Timestamp { get; set; }
+        public string Location { get; set; } = "";
+        public string Product_Name { get; set; } = "";
+        public string Description { get; set; } = "";
+        public decimal Total_Amount { get; set; }
+        public decimal Unit_Price { get; set; }
+        public int Quantity { get; set; }
+    }
+
+
 }
