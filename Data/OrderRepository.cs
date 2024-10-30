@@ -151,6 +151,7 @@ namespace ECSTASYJEWELS
                     prod.Product_Name,
                     prod.[Description],
                     oi.Unit_Price,
+                    oi.Order_Item_ID,
                     pi.Image_URL AS Product_Image,
                     addr.City AS City_Name,
                     
@@ -188,7 +189,8 @@ namespace ECSTASYJEWELS
                     prod.[Description],
                     oi.Unit_Price,
                     pi.Image_URL,
-                    addr.City";
+                    addr.City,
+                    oi.Order_Item_ID";
 
                     using (var command = new SqlCommand(query, conn))
                     {
@@ -201,6 +203,7 @@ namespace ECSTASYJEWELS
                                 orderItems.Add(new OrderInputOutput
                                 {
                                     Order_ID = (int)reader["Order_ID"],
+                                    Order_Item_ID = (int)reader["Order_Item_ID"],
                                     Product_ID = (int)reader["Product_ID"],
                                     Quantity = (int)reader["Quantity"],
                                     Payment_Status = reader["Payment_Status"].ToString() ?? "",
@@ -274,7 +277,7 @@ namespace ECSTASYJEWELS
         }
 
 
-        public async Task<IEnumerable<Order_Description>> GetOrderDescription(int Order_ID)
+        public async Task<IEnumerable<Order_Description>> GetOrderDescription(int Order_Item_ID)
         {
             var orderDescriptions = new List<Order_Description>();
 
@@ -294,6 +297,7 @@ namespace ECSTASYJEWELS
                     prod.Product_Name,
                     prod.[Description],
                     ord.Total_Amount,
+                    ord.Order_ID,
                     oi.Unit_Price,
                     oi.Quantity
                 FROM 
@@ -307,13 +311,13 @@ namespace ECSTASYJEWELS
                 INNER JOIN 
                     Product_Images pi ON pi.Product_ID = oi.Product_ID
                 WHERE 
-                    pi.Is_Primary = 1 AND ord.Order_ID = @Order_ID
+                    pi.Is_Primary = 1 AND oi.Order_Item_ID = @Order_Item_ID
                 ORDER BY 
-                    os.Status_Timestamp DESC";
+                    os.Status_Timestamp asc";
 
                     using (var command = new SqlCommand(query, conn))
                     {
-                        command.Parameters.AddWithValue("@Order_ID", Order_ID);
+                        command.Parameters.AddWithValue("@Order_Item_ID", Order_Item_ID);
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
@@ -321,7 +325,8 @@ namespace ECSTASYJEWELS
                             {
                                 orderDescriptions.Add(new Order_Description
                                 {
-                                    Order_ID = Order_ID,
+                                    Order_ID = (int)reader["Order_ID"],
+                                    Order_Item_ID = Order_Item_ID,
                                     Product_Image = reader["Product_Image"].ToString() ?? "",
                                     Status = reader["Status"].ToString() ?? "",
                                     Status_Timestamp = (DateTime)reader["Status_Timestamp"],
@@ -357,6 +362,7 @@ namespace ECSTASYJEWELS
     public class OrderInputOutput
     {
         public int Order_ID { get; set; }
+        public int Order_Item_ID {get;set;}
         public int Product_ID { get; set; }
         public int Quantity { get; set; }
         public string Payment_Status { get; set; } = "";
@@ -374,7 +380,8 @@ namespace ECSTASYJEWELS
 
     public class Order_Description
     {
-        public int Order_ID {get;set;}
+        public int Order_ID { get; set; }
+        public int Order_Item_ID { get; set; }
         public string Product_Image { get; set; } = "";
         public string Status { get; set; } = "";
         public DateTime Status_Timestamp { get; set; }

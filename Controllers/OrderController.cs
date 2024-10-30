@@ -66,12 +66,12 @@ namespace ECSTASYJEWELS.Controllers
             }
         }
 
-        [HttpGet("description/{Order_ID}")]
-        public async Task<ActionResult<IEnumerable<Order_Description[]>>> GetOrderDescription(int Order_ID)
+        [HttpGet("description/{Order_Item_ID}")]
+        public async Task<ActionResult<IEnumerable<Order_Description[]>>> GetOrderDescription(int Order_Item_ID)
         {
             try
             {
-                var products = await _repository.GetOrderDescription(Order_ID);
+                var products = await _repository.GetOrderDescription(Order_Item_ID);
                 return Ok(products);
             }
             catch (Exception ex)
