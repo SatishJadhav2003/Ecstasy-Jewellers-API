@@ -1,11 +1,39 @@
 {
   "Version": 1,
-  "Hash": "yGFwjvwjKCqhDuY+Qmya+vYQ8JVLHCgn3rE/exhURPU=",
+  "Hash": "KR8v/1Ng8WjRJ+rOzuYELS/UfcTaOAnZb+OttpZbXZc=",
   "Source": "Ecstasy_Jewels_API",
   "BasePath": "_content/Ecstasy_Jewels_API",
   "Mode": "Default",
   "ManifestType": "Build",
   "ReferencedProjectsConfiguration": [],
-  "DiscoveryPatterns": [],
-  "Assets": []
+  "DiscoveryPatterns": [
+    {
+      "Name": "Ecstasy_Jewels_API/wwwroot",
+      "Source": "Ecstasy_Jewels_API",
+      "ContentRoot": "/Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/wwwroot/",
+      "BasePath": "_content/Ecstasy_Jewels_API",
+      "Pattern": "**"
+    }
+  ],
+  "Assets": [
+    {
+      "Identity": "/Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/wwwroot/uploads/Screenshot 2024-11-02 at 10.04.31\u202FAM.png",
+      "SourceId": "Ecstasy_Jewels_API",
+      "SourceType": "Discovered",
+      "ContentRoot": "/Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/wwwroot/",
+      "BasePath": "_content/Ecstasy_Jewels_API",
+      "RelativePath": "uploads/Screenshot 2024-11-02 at 10.04.31\u202FAM.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "PreferTarget",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/Screenshot 2024-11-02 at 10.04.31\u202FAM.png"
+    }
+  ]
 }

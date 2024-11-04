@@ -42,6 +42,10 @@ builder.Services.AddSingleton<WatchlistRepository>(sp =>
     new WatchlistRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
 
+builder.Services.AddSingleton<CustomOrderRepository>(sp =>
+    new CustomOrderRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
+
 
 builder.Services.AddScoped<TokenService>();
 

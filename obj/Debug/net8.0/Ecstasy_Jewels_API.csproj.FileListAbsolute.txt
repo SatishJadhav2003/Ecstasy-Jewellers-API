@@ -48,3 +48,4 @@
 /Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/obj/Debug/net8.0/Ecstasy_Jewels_API.pdb
 /Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/obj/Debug/net8.0/Ecstasy_Jewels_API.genruntimeconfig.cache
 /Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/obj/Debug/net8.0/ref/Ecstasy_Jewels_API.dll
+/Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/bin/Debug/net8.0/Ecstasy_Jewels_API.staticwebassets.runtime.json

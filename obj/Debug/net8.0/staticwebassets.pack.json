@@ -1,0 +1,25 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/wwwroot/uploads/Screenshot 2024-11-02 at 10.04.31\u202FAM.png",
+      "PackagePath": "staticwebassets/uploads/Screenshot 2024-11-02 at 10.04.31\u202FAM.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.Ecstasy_Jewels_API.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.Ecstasy_Jewels_API.props",
+      "PackagePath": "build\\Ecstasy_Jewels_API.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.Ecstasy_Jewels_API.props",
+      "PackagePath": "buildMultiTargeting\\Ecstasy_Jewels_API.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.Ecstasy_Jewels_API.props",
+      "PackagePath": "buildTransitive\\Ecstasy_Jewels_API.props"
+    }
+  ],
+  "ElementsToRemove": []
+}
