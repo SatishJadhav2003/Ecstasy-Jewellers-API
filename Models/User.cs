@@ -5,6 +5,7 @@ namespace ECSTASYJEWELS.Models
         public int User_ID { get; set; }
         public string First_Name { get; set; } = string.Empty;
         public string Last_Name { get; set; } = string.Empty;
+        public string Gender { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public bool Email_Verified { get; set; }
         public string Phone_Number { get; set; } = string.Empty;

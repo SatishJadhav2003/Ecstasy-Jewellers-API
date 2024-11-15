@@ -1,3 +1,4 @@
+using ECSTASYJEWELS.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ECSTASYJEWELS.Controllers
@@ -60,6 +61,20 @@ namespace ECSTASYJEWELS.Controllers
                 return BadRequest("Not Registered");
             }
             return Ok(user);
+        }
+
+        [HttpGet("{User_ID}")]
+        public async Task<ActionResult<IEnumerable<User>>> GetUserInfo(decimal User_ID)
+        {
+            try
+            {
+                var response = await _repository.GetUserInfo(User_ID);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Internal server error
+            }
         }
 
 

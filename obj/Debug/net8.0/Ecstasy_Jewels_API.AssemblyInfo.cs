@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ecstasy_Jewels_API")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bad65d88d4f3edd10c82845e55924b54d6367911")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5371c15d8fa6ead5df9176acbeb6f904275aa9d4")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ecstasy_Jewels_API")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ecstasy_Jewels_API")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

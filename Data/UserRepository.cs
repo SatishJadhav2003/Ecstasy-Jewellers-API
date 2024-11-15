@@ -125,6 +125,51 @@ namespace ECSTASYJEWELS
                 }
             }
         }
+
+        public async Task<IEnumerable<User>> GetUserInfo(decimal User_ID)
+        {
+            var items = new List<User>();
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+                    var command = new SqlCommand("select User_ID,First_Name,Last_Name,Gender,Phone_Number,Phone_Verified,Email,Email_Verified from Users " +
+                    "WHERE User_ID = @User_ID", conn);
+                    command.Parameters.AddWithValue("@User_ID", User_ID);
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            items.Add(new User
+                            {
+                                User_ID = (int)reader["User_ID"],
+                                First_Name = reader["First_Name"].ToString() ?? "",
+                                Last_Name = reader["Last_Name"].ToString() ?? "",
+                                Gender = reader["Gender"].ToString() ?? "",
+                                Email = reader["Email"].ToString() ?? "",
+                                Email_Verified = (bool)reader["Email_Verified"],
+                                Phone_Number = reader["Phone_Number"].ToString() ?? "",
+                                Phone_Verified = (bool)reader["Phone_Verified"],
+                            });
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Log exception (consider using a logging framework)
+                throw new Exception("Database error occurred while retrieving User Info." + ex);
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                throw new Exception("An error occurred while retrieving User Info." + ex);
+            }
+            return items;
+        }
+
+
     }
 
     public class RegisterUserInfo
@@ -135,8 +180,8 @@ namespace ECSTASYJEWELS
     }
     public class LoginUser
     {
-        public string Email {get;set;}="";
-        public string Password {get;set;}="";
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
 
     }
 }
