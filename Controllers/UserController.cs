@@ -51,10 +51,10 @@ namespace ECSTASYJEWELS.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterUserInfo registerUser,string password)
+        public async Task<IActionResult> Register(RegisterUserInfo registerUser, string password)
         {
 
-            var user = await _repository.Register(registerUser,password);
+            var user = await _repository.Register(registerUser, password);
 
             if (user == null)
             {
@@ -77,6 +77,19 @@ namespace ECSTASYJEWELS.Controllers
             }
         }
 
+        [HttpPost("updateinfo")]
+        public async Task<ActionResult<IEnumerable<User>>> UpdateUserInfo(User userinfo)
+        {
+            try
+            {
+                var response = await _repository.UpdateUserInfo(userinfo);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Internal server error
+            }
+        }
 
     }
 

@@ -169,6 +169,55 @@ namespace ECSTASYJEWELS
             return items;
         }
 
+public async Task<bool> UpdateUserInfo(User user)
+{
+    bool isUpdated = false;
+    try
+    {
+        using (var conn = new SqlConnection(_connectionString))
+        {
+            await conn.OpenAsync();
+            var command = new SqlCommand(@"
+                UPDATE Users 
+                SET 
+                    First_Name = @First_Name,
+                    Last_Name = @Last_Name,
+                    Gender = @Gender,
+                    Phone_Number = @Phone_Number,
+                    Phone_Verified = @Phone_Verified,
+                    Email = @Email,
+                    Email_Verified = @Email_Verified
+                WHERE 
+                    User_ID = @User_ID", conn);
+
+            // Add parameters to prevent SQL injection
+            command.Parameters.AddWithValue("@User_ID", user.User_ID);
+            command.Parameters.AddWithValue("@First_Name", user.First_Name ?? string.Empty);
+            command.Parameters.AddWithValue("@Last_Name", user.Last_Name ?? string.Empty);
+            command.Parameters.AddWithValue("@Gender", user.Gender ?? string.Empty);
+            command.Parameters.AddWithValue("@Phone_Number", user.Phone_Number ?? string.Empty);
+            command.Parameters.AddWithValue("@Phone_Verified", user.Phone_Verified);
+            command.Parameters.AddWithValue("@Email", user.Email ?? string.Empty);
+            command.Parameters.AddWithValue("@Email_Verified", user.Email_Verified);
+
+            // Execute the query and check the result
+            var rowsAffected = await command.ExecuteNonQueryAsync();
+            isUpdated = rowsAffected > 0;
+        }
+    }
+    catch (SqlException ex)
+    {
+        // Log exception (consider using a logging framework)
+        throw new Exception("Database error occurred while updating User Info." + ex);
+    }
+    catch (Exception ex)
+    {
+        // Log exception
+        throw new Exception("An error occurred while updating User Info." + ex);
+    }
+
+    return isUpdated;
+}
 
     }
 
