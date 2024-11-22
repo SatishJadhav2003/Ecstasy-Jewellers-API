@@ -1,6 +1,6 @@
 namespace ECSTASYJEWELS.Models
 {
-    public class Reviews
+    public class Rating_Reviews
     {
         public int Review_ID { get; set; }
         public int Product_ID { get; set; }
