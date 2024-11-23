@@ -76,23 +76,19 @@ namespace ECSTASYJEWELS.Controllers
                             string fileName = $"{Guid.NewGuid()}_{image.FileName}";
                             string filePath = Path.Combine(uploadPath, fileName);
 
-                            Console.WriteLine($"Saving file: {filePath}");
                             using (var fileStream = new FileStream(filePath, FileMode.Create))
                             {
                                 await image.CopyToAsync(fileStream);
                             }
-                            Console.WriteLine($"File saved: {filePath}");
 
 
                             // Create ReviewImage object
-                            var reviewImage = new ReviewImage
+                            var reviewImage = new Review_Images
                             {
                                 Review_ID = reviewId,
                                 Product_ID = reviewData.Product_ID,
                                 Image = fileName
                             };
-Console.WriteLine($"Adding image to DB: Review_ID={reviewImage.Review_ID}, Product_ID={reviewImage.Product_ID}, Image={reviewImage.Image}");
-
                             // Save the image path using the repository
                             await _repository.AddReviewImage(reviewImage);
                         }
@@ -104,6 +100,77 @@ Console.WriteLine($"Adding image to DB: Review_ID={reviewImage.Review_ID}, Produ
             catch (Exception ex)
             {
                 // Log the error and return a 500 status code
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("GetReviewImagesByProduct/{productId}")]
+        public async Task<ActionResult<IEnumerable<Review_Images>>> GetReviewImagesByProduct(int productId)
+        {
+            try
+            {
+                var images = await _repository.GetReviewImagesByProduct(productId);
+                if (images == null || !images.Any())
+                {
+                    return NotFound("No images found for the given Product ID.");
+                }
+                return Ok(images);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and return 500
+                return StatusCode(500, ex.Message);
+            }
+        }
+        [HttpGet("GetImageById/{imageId}")]
+        public async Task<ActionResult<Review_Images>> GetImageById(int imageId)
+        {
+            try
+            {
+                var image = await _repository.GetReviewImageById(imageId);
+                if (image == null)
+                {
+                    return NotFound("No image found for the given Image ID.");
+                }
+                return Ok(image);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception and return 500
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+        [HttpGet("{productId}")]
+        public async Task<IActionResult> GetReviewsByProduct(int productId)
+        {
+            var reviews = await _repository.GetReviewsAndRatingsByProduct(productId);
+            if (reviews == null || !reviews.Any())
+            {
+                return NotFound(new { Message = "No reviews found for the given product." });
+            }
+            return Ok(reviews);
+        }
+
+        [HttpGet("images/{fileName}")]
+        public IActionResult GetImage(string fileName)
+        {
+            try
+            {
+                // Set the path to where the images are stored
+                string imagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/review_images/", fileName);
+
+                if (!System.IO.File.Exists(imagePath))
+                {
+                    return NotFound("Image not found.");
+                }
+
+                // Return the image as a file
+                var fileBytes = System.IO.File.ReadAllBytes(imagePath);
+                return File(fileBytes, "image/jpeg"); // Adjust MIME type if needed
+            }
+            catch (Exception ex)
+            {
                 return StatusCode(500, ex.Message);
             }
         }

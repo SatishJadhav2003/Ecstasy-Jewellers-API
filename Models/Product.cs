@@ -8,6 +8,9 @@ namespace ECSTASYJEWELS.Models
         public int Category_ID { get; set; }
         public decimal Price { get; set; }
         public int Stock_Quantity { get; set; }
+          public int Total_Ratings { get; set; }
+        public int Total_Reviews { get; set; }
+        public decimal Rating { get; set; }
         public decimal Weight { get; set; }
         public string Product_Image { get; set; } = string.Empty;
         

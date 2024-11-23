@@ -1,6 +1,6 @@
 namespace ECSTASYJEWELS.Models
 {
-  public  class ReviewImage
+  public  class Review_Images
     {
         public int RR_Image_ID {get;set;}
         public int Review_ID {get;set;}

@@ -19,7 +19,7 @@ namespace ECSTASYJEWELS.Controllers
         }
 
         [HttpGet("{Product_ID}")]
-        public async Task<ActionResult<IEnumerable<ProductData[]>>> GetProductByID(decimal Product_ID)
+        public async Task<ActionResult<IEnumerable<ProductData[]>>> GetProductByID(int Product_ID)
         {
             try
             {

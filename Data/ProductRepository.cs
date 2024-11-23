@@ -35,6 +35,9 @@ namespace ECSTASYJEWELS.Data
                                 Price = (decimal)reader["Price"],
                                 Weight = (decimal)reader["Weight"],
                                 Stock_Quantity = (int)reader["Stock_Quantity"],
+                                Rating = (decimal)reader["Rating"],
+                                Total_Ratings = (int)reader["Total_Ratings"],
+                                Total_Reviews = (int)reader["Total_Reviews"],
                             });
                         }
                     }
@@ -54,7 +57,7 @@ namespace ECSTASYJEWELS.Data
             return products;
         }
 
-        public async Task<ProductData[]> GetProductById(decimal Product_ID)
+        public async Task<ProductData[]> GetProductById(int Product_ID)
         {
             var product = new List<ProductData>();
             try
@@ -63,7 +66,7 @@ namespace ECSTASYJEWELS.Data
                 {
                     await conn.OpenAsync();
                     var command = new SqlCommand(
-                        "SELECT PROD.Product_ID, PROD.Category_ID, PROD.Product_Name, PROD.Description, PROD.Price, PROD.Weight, PROD.Stock_Quantity, " +
+                        "SELECT PROD.Product_ID,PROD.Rating,PROD.Total_Ratings,PROD.Total_Reviews, PROD.Category_ID, PROD.Product_Name, PROD.Description, PROD.Price, PROD.Weight, PROD.Stock_Quantity, " +
                         "DIM.Dimension_ID, DIM.Title, DIM.Dim_Desc, " +  
                         "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = PROD.Product_ID AND img.Is_Primary = 1) as Product_Image "+
                         "FROM Products AS PROD "+
@@ -88,7 +91,10 @@ namespace ECSTASYJEWELS.Data
                                 Weight = (decimal)reader["Weight"],
                                 Title = reader["Title"].ToString() ?? "",
                                 Dim_Desc = reader["Dim_Desc"].ToString() ?? "",
-                                Stock_Quantity = (int)reader["Stock_Quantity"]
+                                Stock_Quantity = (int)reader["Stock_Quantity"],
+                                Rating = (decimal)reader["Rating"],
+                                 Total_Ratings = (int)reader["Total_Ratings"],
+                                Total_Reviews = (int)reader["Total_Reviews"],
                             });
                         }
                     }
@@ -118,6 +124,9 @@ namespace ECSTASYJEWELS.Data
         public int Category_ID { get; set; }
         public decimal Price { get; set; }
         public int Stock_Quantity { get; set; }
+        public int Total_Ratings { get; set; }
+        public int Total_Reviews { get; set; }
+        public decimal Rating { get; set; }
         public decimal Weight { get; set; }
         public string Product_Image { get; set; } = string.Empty;
 

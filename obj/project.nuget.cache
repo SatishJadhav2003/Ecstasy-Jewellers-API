@@ -1,10 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "Nbxx0u/JJTw=",
+  "dgSpecHash": "Y8hJMbn6y70=",
   "success": true,
   "projectFilePath": "/Users/satishjadhav/Desktop/Jewellers/Ecstasy_Jewels_API/Ecstasy_Jewels_API.csproj",
   "expectedPackageFiles": [
     "/Users/satishjadhav/.nuget/packages/bcrypt.net-next/4.0.3/bcrypt.net-next.4.0.3.nupkg.sha512",
+    "/Users/satishjadhav/.nuget/packages/dapper/2.1.35/dapper.2.1.35.nupkg.sha512",
     "/Users/satishjadhav/.nuget/packages/microsoft.aspnetcore.authentication.jwtbearer/8.0.10/microsoft.aspnetcore.authentication.jwtbearer.8.0.10.nupkg.sha512",
     "/Users/satishjadhav/.nuget/packages/microsoft.aspnetcore.openapi/8.0.5/microsoft.aspnetcore.openapi.8.0.5.nupkg.sha512",
     "/Users/satishjadhav/.nuget/packages/microsoft.bcl.timeprovider/8.0.1/microsoft.bcl.timeprovider.8.0.1.nupkg.sha512",
