@@ -20,7 +20,13 @@ namespace ECSTASYJEWELS.Data
                 using (var conn = new SqlConnection(_connectionString))
                 {
                     await conn.OpenAsync();
-                    var command = new SqlCommand("SELECT Product_ID, Product_Name, Description, Price, Weight, Dimensions,Stock_Quantity,  (SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image FROM Products prod WHERE Is_Active = 1 and Category_ID=" + Category_ID, conn);
+                    var command = new SqlCommand(
+                        "SELECT Product_ID, Product_Name, Description, Price, Weight, Dimensions, Stock_Quantity, Rating, Total_Ratings, Total_Reviews, " +
+                        "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image " +
+                        "FROM Products prod WHERE Is_Active = 1 and Category_ID = @Category_ID", conn);
+
+                    // Use parameterized query to avoid SQL injection
+                    command.Parameters.AddWithValue("@Category_ID", Category_ID);
 
                     using (var reader = await command.ExecuteReaderAsync())
                     {
@@ -28,16 +34,16 @@ namespace ECSTASYJEWELS.Data
                         {
                             products.Add(new Product
                             {
-                                Product_ID = (int)reader["Product_ID"],
-                                Product_Name = reader["Product_Name"].ToString() ?? "",
-                                Description = reader["Description"].ToString() ?? "",
-                                Product_Image = reader["Product_Image"].ToString() ?? "",
-                                Price = (decimal)reader["Price"],
-                                Weight = (decimal)reader["Weight"],
-                                Stock_Quantity = (int)reader["Stock_Quantity"],
-                                Rating = (decimal)reader["Rating"],
-                                Total_Ratings = (int)reader["Total_Ratings"],
-                                Total_Reviews = (int)reader["Total_Reviews"],
+                                Product_ID = reader["Product_ID"] == DBNull.Value ? 0 : (int)reader["Product_ID"],
+                                Product_Name = reader["Product_Name"]?.ToString() ?? "",
+                                Description = reader["Description"]?.ToString() ?? "",
+                                Product_Image = reader["Product_Image"]?.ToString() ?? "",
+                                Price = reader["Price"] == DBNull.Value ? 0.0m : (decimal)reader["Price"],
+                                Weight = reader["Weight"] == DBNull.Value ? 0.0m : (decimal)reader["Weight"],
+                                Stock_Quantity = reader["Stock_Quantity"] == DBNull.Value ? 0 : (int)reader["Stock_Quantity"],
+                                Rating = reader["Rating"] == DBNull.Value ? 0.0m : (decimal)reader["Rating"],
+                                Total_Ratings = reader["Total_Ratings"] == DBNull.Value ? 0 : (int)reader["Total_Ratings"],
+                                Total_Reviews = reader["Total_Reviews"] == DBNull.Value ? 0 : (int)reader["Total_Reviews"]
                             });
                         }
                     }
@@ -46,12 +52,12 @@ namespace ECSTASYJEWELS.Data
             catch (SqlException ex)
             {
                 // Log exception (consider using a logging framework)
-                throw new Exception("Database error occurred while retrieving products." + ex);
+                throw new Exception("Database error occurred while retrieving products.", ex);
             }
             catch (Exception ex)
             {
                 // Log exception
-                throw new Exception("An error occurred while retrieving products." + ex);
+                throw new Exception("An error occurred while retrieving products.", ex);
             }
 
             return products;
@@ -67,11 +73,11 @@ namespace ECSTASYJEWELS.Data
                     await conn.OpenAsync();
                     var command = new SqlCommand(
                         "SELECT PROD.Product_ID,PROD.Rating,PROD.Total_Ratings,PROD.Total_Reviews, PROD.Category_ID, PROD.Product_Name, PROD.Description, PROD.Price, PROD.Weight, PROD.Stock_Quantity, " +
-                        "DIM.Dimension_ID, DIM.Title, DIM.Dim_Desc, " +  
-                        "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = PROD.Product_ID AND img.Is_Primary = 1) as Product_Image "+
-                        "FROM Products AS PROD "+
+                        "DIM.Dimension_ID, DIM.Title, DIM.Dim_Desc, " +
+                        "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = PROD.Product_ID AND img.Is_Primary = 1) as Product_Image " +
+                        "FROM Products AS PROD " +
                         "LEFT JOIN Dimensions as DIM ON DIM.Product_ID = PROD.Product_ID " +
-                        "WHERE PROD.Is_Active = 1 AND PROD.Product_ID = @Product_ID", conn); 
+                        "WHERE PROD.Is_Active = 1 AND PROD.Product_ID = @Product_ID", conn);
 
                     command.Parameters.AddWithValue("@Product_ID", Product_ID);
 
@@ -92,9 +98,9 @@ namespace ECSTASYJEWELS.Data
                                 Title = reader["Title"].ToString() ?? "",
                                 Dim_Desc = reader["Dim_Desc"].ToString() ?? "",
                                 Stock_Quantity = (int)reader["Stock_Quantity"],
-                                Rating = (decimal)reader["Rating"],
-                                 Total_Ratings = (int)reader["Total_Ratings"],
-                                Total_Reviews = (int)reader["Total_Reviews"],
+                                Rating = reader["Rating"] == DBNull.Value ? 0.0m : (decimal)reader["Rating"],
+                                Total_Ratings = reader["Total_Ratings"] == DBNull.Value ? 0 : (int)reader["Total_Ratings"],
+                                Total_Reviews = reader["Total_Reviews"] == DBNull.Value ? 0 : (int)reader["Total_Reviews"]
                             });
                         }
                     }
