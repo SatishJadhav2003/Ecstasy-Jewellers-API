@@ -46,7 +46,18 @@ namespace ECSTASYJEWELS.Controllers
             }
         }
 
-        
+        [HttpGet("suggestions/{q}")]
+        public async Task<IActionResult> GetSuggestions(string q)
+        {
+            if (string.IsNullOrWhiteSpace(q))
+                return Ok(new List<string>());
+
+            var suggestions = await _repository.GeatSearchProducts(q);
+            return Ok(suggestions);
+        }
+
+
+
     }
 
 
