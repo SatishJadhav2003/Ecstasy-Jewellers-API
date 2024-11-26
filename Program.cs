@@ -48,7 +48,9 @@ builder.Services.AddSingleton<CustomOrderRepository>(sp =>
 builder.Services.AddSingleton<RatingReviewRepository>(sp =>
     new RatingReviewRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
-
+builder.Services.AddSingleton<MetalRepository>(sp =>
+    new MetalRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
 
 builder.Services.AddScoped<TokenService>();
 
