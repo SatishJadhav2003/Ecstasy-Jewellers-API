@@ -6,6 +6,7 @@ namespace ECSTASYJEWELS.Models
         public string Product_Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public int Category_ID { get; set; }
+        public int Metal_ID { get; set; }
         public decimal Price { get; set; }
         public int Stock_Quantity { get; set; }
           public int Total_Ratings { get; set; }

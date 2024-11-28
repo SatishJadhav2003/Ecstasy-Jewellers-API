@@ -1,4 +1,5 @@
 using System.Data.SqlClient;
+using ECSTASYJEWELS.Controllers;
 using ECSTASYJEWELS.Models;
 
 namespace ECSTASYJEWELS.Data
@@ -170,6 +171,109 @@ namespace ECSTASYJEWELS.Data
             return products;
         }
 
+
+        public async Task<IEnumerable<Product>> GetFilteredProducts(FilterData data)
+        {
+            var products = new List<Product>();
+
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+
+                    // Base query
+                    var query = @"
+                SELECT TOP 20 
+                    Product_ID, Product_Name, Description, Price, Weight, Stock_Quantity, Rating, Total_Ratings, Total_Reviews,
+                    (SELECT img.Image_URL 
+                     FROM Product_Images img 
+                     WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) AS Product_Image
+                FROM Products prod
+                WHERE Is_Active = 1 ";
+
+                    // Initialize parameters
+                    var parameters = new List<SqlParameter>();
+
+                    // Handle Category filter
+                    if (data.Category.Any())
+                    {
+                        query += "AND prod.Category_ID IN (@Category) ";
+                        parameters.Add(new SqlParameter("@Category", string.Join(",", data.Category)));
+                    }
+
+                    // Handle Metal filter
+                    if (data.Metal.Any())
+                    {
+                        query += "AND prod.Metal_ID IN (@Metal) ";
+                        parameters.Add(new SqlParameter("@Metal", string.Join(",", data.Metal)));
+                    }
+
+                    // Handle Price filter
+                    if (data.Price.Any())
+                    {
+                        var priceRanges = new Dictionary<int, (int Min, int Max)>
+                {
+                    { 0, (0, 25000) },
+                    { 25000, (25000, 50000) },
+                    { 50000, (50000, 100000) },
+                    { 100000, (100000, int.MaxValue) }
+                };
+
+                        if (priceRanges.TryGetValue(data.Price.FirstOrDefault(), out var range))
+                        {
+                            query += "AND Price BETWEEN @PriceMin AND @PriceMax ";
+                            parameters.Add(new SqlParameter("@PriceMin", range.Min));
+                            parameters.Add(new SqlParameter("@PriceMax", range.Max));
+                        }
+                    }
+
+                    // Handle Gender filter
+                    if (data.Gender.Any())
+                    {
+                        query += "AND prod.Description LIKE @Gender ";
+                        parameters.Add(new SqlParameter("@Gender", $"%{string.Join("%", data.Gender)}%"));
+                    }
+
+                    // Order by Rating
+                    query += "ORDER BY Rating DESC;";
+                    Console.WriteLine(query);
+                    // Prepare and execute the command
+                    var command = new SqlCommand(query, conn);
+                    command.Parameters.AddRange(parameters.ToArray());
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            products.Add(new Product
+                            {
+                                Product_ID = reader["Product_ID"] as int? ?? 0,
+                                Product_Name = reader["Product_Name"]?.ToString() ?? "",
+                                Description = reader["Description"]?.ToString() ?? "",
+                                Product_Image = reader["Product_Image"]?.ToString() ?? "",
+                                Price = reader["Price"] as decimal? ?? 0,
+                                Weight = reader["Weight"] as decimal? ?? 0,
+                                Stock_Quantity = reader["Stock_Quantity"] as int? ?? 0,
+                                Rating = reader["Rating"] as decimal? ?? 0,
+                                Total_Ratings = reader["Total_Ratings"] as int? ?? 0,
+                                Total_Reviews = reader["Total_Reviews"] as int? ?? 0
+                            });
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Database error occurred while retrieving products.", ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("An error occurred while retrieving products.", ex);
+            }
+
+            return products;
+        }
 
     }
 

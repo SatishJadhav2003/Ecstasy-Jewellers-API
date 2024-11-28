@@ -56,9 +56,21 @@ namespace ECSTASYJEWELS.Controllers
             return Ok(suggestions);
         }
 
-
+        [HttpPost("GetFiltered")]
+        public async Task<IActionResult> GetFilteredData(FilterData data)
+        {
+            var suggestions = await _repository.GetFilteredProducts(data);
+            return Ok(suggestions);
+        }
 
     }
+    public class FilterData
+    {
+        public List<int> Category { get; set; } = new List<int>();
+        public List<string> Gender { get; set; } = new List<string>();
+        public List<int> Metal { get; set; } = new List<int>();
+        public List<int> Price { get; set; } = new List<int>();
 
+    }
 
 }
