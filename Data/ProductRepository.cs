@@ -198,46 +198,95 @@ namespace ECSTASYJEWELS.Data
                     // Handle Category filter
                     if (data.Category.Any())
                     {
-                        query += "AND prod.Category_ID IN (@Category) ";
-                        parameters.Add(new SqlParameter("@Category", string.Join(",", data.Category)));
+                        var categoryConditions = new List<string>();
+                        int categoryIndex = 0;
+
+                        foreach (var category in data.Category)
+                        {
+                            var paramName = $"@Category{categoryIndex}";
+                            categoryConditions.Add(paramName);
+                            parameters.Add(new SqlParameter(paramName, category));
+                            categoryIndex++;
+                        }
+
+                        query += $"AND prod.Category_ID IN ({string.Join(",", categoryConditions)}) ";
                     }
 
                     // Handle Metal filter
                     if (data.Metal.Any())
                     {
-                        query += "AND prod.Metal_ID IN (@Metal) ";
-                        parameters.Add(new SqlParameter("@Metal", string.Join(",", data.Metal)));
+                        var metalConditions = new List<string>();
+                        int metalIndex = 0;
+
+                        foreach (var metal in data.Metal)
+                        {
+                            var paramName = $"@Metal{metalIndex}";
+                            metalConditions.Add(paramName);
+                            parameters.Add(new SqlParameter(paramName, metal));
+                            metalIndex++;
+                        }
+
+                        query += $"AND prod.Metal_ID IN ({string.Join(",", metalConditions)}) ";
                     }
+
 
                     // Handle Price filter
                     if (data.Price.Any())
                     {
-                        var priceRanges = new Dictionary<int, (int Min, int Max)>
-                {
-                    { 0, (0, 25000) },
-                    { 25000, (25000, 50000) },
-                    { 50000, (50000, 100000) },
-                    { 100000, (100000, int.MaxValue) }
-                };
+                        var priceConditions = new List<string>();
+                        int priceIndex = 0;
 
-                        if (priceRanges.TryGetValue(data.Price.FirstOrDefault(), out var range))
+                        var priceRanges = new Dictionary<int, (int Min, int Max)>
+                            {
+                                { 0, (0, 25000) },
+                                { 25000, (25000, 50000) },
+                                { 50000, (50000, 100000) },
+                                { 100000, (100000, int.MaxValue) }
+                            };
+
+                        foreach (var price in data.Price)
                         {
-                            query += "AND Price BETWEEN @PriceMin AND @PriceMax ";
-                            parameters.Add(new SqlParameter("@PriceMin", range.Min));
-                            parameters.Add(new SqlParameter("@PriceMax", range.Max));
+                            if (priceRanges.TryGetValue(price, out var range))
+                            {
+                                var minParam = $"@PriceMin{priceIndex}";
+                                var maxParam = $"@PriceMax{priceIndex}";
+                                priceConditions.Add($"Price BETWEEN {minParam} AND {maxParam}");
+                                parameters.Add(new SqlParameter(minParam, range.Min));
+                                parameters.Add(new SqlParameter(maxParam, range.Max));
+                                priceIndex++;
+                            }
+                        }
+
+                        // Combine conditions with OR
+                        if (priceConditions.Any())
+                        {
+                            query += $"AND ({string.Join(" OR ", priceConditions)}) ";
                         }
                     }
 
                     // Handle Gender filter
                     if (data.Gender.Any())
                     {
-                        query += "AND prod.Description LIKE @Gender ";
-                        parameters.Add(new SqlParameter("@Gender", $"%{string.Join("%", data.Gender)}%"));
+                        var genderConditions = new List<string>();
+                        int genderIndex = 0;
+
+                        foreach (var gender in data.Gender)
+                        {
+                            var paramName = $"@Gender{genderIndex}";
+                            genderConditions.Add($"prod.Description LIKE {paramName}");
+                            parameters.Add(new SqlParameter(paramName, $"%{gender}%"));
+                            genderIndex++;
+                        }
+
+                        // Combine conditions with OR
+                        query += $"AND ({string.Join(" OR ", genderConditions)}) ";
                     }
+
 
                     // Order by Rating
                     query += "ORDER BY Rating DESC;";
-                    Console.WriteLine(query);
+                    
+
                     // Prepare and execute the command
                     var command = new SqlCommand(query, conn);
                     command.Parameters.AddRange(parameters.ToArray());
