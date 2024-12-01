@@ -22,9 +22,12 @@ namespace ECSTASYJEWELS.Data
                 {
                     await conn.OpenAsync();
                     var command = new SqlCommand(
-                        "SELECT Product_ID, Product_Name, Description, Price, Weight, Dimensions, Stock_Quantity, Rating, Total_Ratings, Total_Reviews, " +
-                        "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image " +
-                        "FROM Products prod WHERE Is_Active = 1 and Category_ID = @Category_ID", conn);
+                        @"SELECT Product_ID, Product_Name, Description, 
+                            (Price +(select Top(1) Metal_Prices.Price from Metal_Prices where Metal_Prices.Metal_ID=prod.Metal_ID order by Date_Added desc)) as Price,
+                            Weight, Dimensions, Stock_Quantity, Rating, Total_Ratings, Total_Reviews, 
+                            (SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image 
+                            FROM Products prod 
+                            WHERE Is_Active = 1 and Category_ID = @Category_ID", conn);
 
                     // Use parameterized query to avoid SQL injection
                     command.Parameters.AddWithValue("@Category_ID", Category_ID);
@@ -73,12 +76,14 @@ namespace ECSTASYJEWELS.Data
                 {
                     await conn.OpenAsync();
                     var command = new SqlCommand(
-                        "SELECT PROD.Product_ID,PROD.Rating,PROD.Total_Ratings,PROD.Total_Reviews, PROD.Category_ID, PROD.Product_Name, PROD.Description, PROD.Price, PROD.Weight, PROD.Stock_Quantity, " +
-                        "DIM.Dimension_ID, DIM.Title, DIM.Dim_Desc, " +
-                        "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = PROD.Product_ID AND img.Is_Primary = 1) as Product_Image " +
-                        "FROM Products AS PROD " +
-                        "LEFT JOIN Dimensions as DIM ON DIM.Product_ID = PROD.Product_ID " +
-                        "WHERE PROD.Is_Active = 1 AND PROD.Product_ID = @Product_ID", conn);
+                        @"SELECT PROD.Product_ID,PROD.Rating,PROD.Total_Ratings,PROD.Total_Reviews, PROD.Category_ID, PROD.Product_Name, PROD.Description,
+                        (PROD.Price +(select Top(1) Metal_Prices.Price from Metal_Prices where Metal_Prices.Metal_ID=prod.Metal_ID order by Date_Added desc)) as Price,
+                        PROD.Weight, PROD.Stock_Quantity, 
+                        DIM.Dimension_ID, DIM.Title, DIM.Dim_Desc,  
+                        (SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = PROD.Product_ID AND img.Is_Primary = 1) as Product_Image  
+                        FROM Products AS PROD  
+                        LEFT JOIN Dimensions as DIM ON DIM.Product_ID = PROD.Product_ID  
+                        WHERE PROD.Is_Active = 1 AND PROD.Product_ID = @Product_ID", conn);
 
                     command.Parameters.AddWithValue("@Product_ID", Product_ID);
 
@@ -130,9 +135,11 @@ namespace ECSTASYJEWELS.Data
                 {
                     await conn.OpenAsync();
                     var command = new SqlCommand(
-                        "SELECT TOP 20 Product_ID, Product_Name, Description, Price, Weight, Dimensions, Stock_Quantity, Rating, Total_Ratings, Total_Reviews, " +
-                        "(SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image " +
-                        "FROM Products prod WHERE Is_Active = 1 and Product_Name like @Query or Description like @Query order by Rating Desc", conn);
+                        @"SELECT TOP 20 Product_ID, Product_Name, Description,
+                        (Price +(select Top(1) Metal_Prices.Price from Metal_Prices where Metal_Prices.Metal_ID=prod.Metal_ID order by Date_Added desc)) as Price,
+                        Weight, Dimensions, Stock_Quantity, Rating, Total_Ratings, Total_Reviews,
+                        (SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image
+                        FROM Products prod WHERE Is_Active = 1 and Product_Name like @Query or Description like @Query order by Rating Desc", conn);
 
                     // Use parameterized query to avoid SQL injection
                     command.Parameters.AddWithValue("@Query", $"%{query}%");
@@ -184,8 +191,10 @@ namespace ECSTASYJEWELS.Data
 
                     // Base query
                     var query = @"
-                SELECT TOP 20 
-                    Product_ID, Product_Name, Description, Price, Weight, Stock_Quantity, Rating, Total_Ratings, Total_Reviews,
+                SELECT TOP 40 
+                    Product_ID, Product_Name, Description, 
+                    (Price +(select Top(1) Metal_Prices.Price from Metal_Prices where Metal_Prices.Metal_ID=prod.Metal_ID order by Date_Added desc)) as Price,
+                    Weight, Stock_Quantity, Rating, Total_Ratings, Total_Reviews,
                     (SELECT img.Image_URL 
                      FROM Product_Images img 
                      WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) AS Product_Image
@@ -285,7 +294,7 @@ namespace ECSTASYJEWELS.Data
 
                     // Order by Rating
                     query += "ORDER BY Rating DESC;";
-                    
+
 
                     // Prepare and execute the command
                     var command = new SqlCommand(query, conn);

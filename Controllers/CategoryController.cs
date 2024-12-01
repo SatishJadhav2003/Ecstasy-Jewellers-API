@@ -31,6 +31,20 @@ namespace ECSTASYJEWELS.Controllers
             }
         }
 
+        [HttpGet("GetCategoryByID/{Category_ID}")]
+        public async Task<ActionResult<IEnumerable<Category>>> GetCategoryByID(int Category_ID)
+        {
+            try
+            {
+                var category = await _repository.GetCategoryByID(Category_ID);
+                return Ok(category);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Internal server error
+            }
+        }
+
 
 
     }

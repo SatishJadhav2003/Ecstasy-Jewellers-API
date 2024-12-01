@@ -48,6 +48,45 @@ namespace ECSTASYJEWELS
             }
             return category;
         }
+        
+        public async Task<IEnumerable<Category>> GetCategoryByID(int Category_ID)
+        {
+            var category = new List<Category>();
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+                    var command = new SqlCommand("SELECT Category_ID, Category_Name, Category_Image FROM Category WHERE Category_ID = "+Category_ID, conn);
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            category.Add(new Category
+                            {
+                                Category_ID = (int)reader["Category_ID"],
+                                Category_Name = reader["Category_Name"].ToString()??"",
+                                Category_Image = reader["Category_Image"].ToString() ??""
+                            });
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Log exception (consider using a logging framework)
+                throw new Exception("Database error occurred while retrieving Category.", ex);
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                throw new Exception("An error occurred while retrieving Category.", ex);
+            }
+            return category;
+        }
+       
+        
         public async Task<bool> AddCategory(Category category)
         {
             try

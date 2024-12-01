@@ -63,10 +63,11 @@ namespace ECSTASYJEWELS
                 using (var conn = new SqlConnection(_connectionString))
                 {
                     await conn.OpenAsync();
-                    var command = new SqlCommand("SELECT Watchlist_ID, Products.Product_ID,Products.Product_Name,Products.Description,Products.Price  " +
-                    ",(select Image_URL from Product_Images where Product_Images.Product_ID=Products.Product_ID and Product_Images.Is_Primary=1 ) as Product_Image " +
-                    "FROM Watchlist inner join Products on Products.Product_ID =Watchlist.Product_ID " +
-                    "WHERE User_ID = @User_ID", conn);
+                    var command = new SqlCommand(@"SELECT Watchlist_ID, Products.Product_ID,Products.Product_Name,Products.Description,
+(Price +(select Top(1) Metal_Prices.Price from Metal_Prices where Metal_Prices.Metal_ID=products.Metal_ID order by Date_Added desc)) as Price 
+                    ,(select Image_URL from Product_Images where Product_Images.Product_ID=Products.Product_ID and Product_Images.Is_Primary=1 ) as Product_Image 
+                    FROM Watchlist inner join Products on Products.Product_ID =Watchlist.Product_ID 
+                    WHERE User_ID = @User_ID", conn);
                     command.Parameters.AddWithValue("@User_ID", User_ID);
                     using (var reader = await command.ExecuteReaderAsync())
                     {

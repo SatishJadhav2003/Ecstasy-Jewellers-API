@@ -52,6 +52,10 @@ builder.Services.AddSingleton<MetalRepository>(sp =>
     new MetalRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
 );
 
+builder.Services.AddSingleton<CommonRepository>(sp =>
+    new CommonRepository(builder.Configuration.GetConnectionString("DefaultConnection") ?? "")
+);
+
 builder.Services.AddScoped<TokenService>();
 
 // 2. Register Controllers and JSON Serialization options
