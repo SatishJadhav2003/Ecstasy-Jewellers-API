@@ -27,7 +27,7 @@ namespace ECSTASYJEWELS.Data
                             Weight, Dimensions, Stock_Quantity, Rating, Total_Ratings, Total_Reviews, 
                             (SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image 
                             FROM Products prod 
-                            WHERE Is_Active = 1 and Category_ID = @Category_ID", conn);
+                            WHERE Is_Active = 1 and Category_ID = @Category_ID order by Total_Ratings desc", conn);
 
                     // Use parameterized query to avoid SQL injection
                     command.Parameters.AddWithValue("@Category_ID", Category_ID);
@@ -139,7 +139,7 @@ namespace ECSTASYJEWELS.Data
                         (Price +(select Top(1) Metal_Prices.Price from Metal_Prices where Metal_Prices.Metal_ID=prod.Metal_ID order by Date_Added desc)) as Price,
                         Weight, Dimensions, Stock_Quantity, Rating, Total_Ratings, Total_Reviews,
                         (SELECT img.Image_URL FROM Product_Images img WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) as Product_Image
-                        FROM Products prod WHERE Is_Active = 1 and Product_Name like @Query or Description like @Query order by Rating Desc", conn);
+                        FROM Products prod WHERE Is_Active = 1 and Product_Name like @Query or Description like @Query order by Total_Ratings desc", conn);
 
                     // Use parameterized query to avoid SQL injection
                     command.Parameters.AddWithValue("@Query", $"%{query}%");
@@ -199,7 +199,7 @@ namespace ECSTASYJEWELS.Data
                      FROM Product_Images img 
                      WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) AS Product_Image
                 FROM Products prod
-                WHERE Is_Active = 1 ";
+                WHERE Is_Active = 1 order by Total_Ratings desc";
 
                     // Initialize parameters
                     var parameters = new List<SqlParameter>();
@@ -340,6 +340,7 @@ namespace ECSTASYJEWELS.Data
         public int Product_ID { get; set; }
         public string Product_Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string Category_Name { get; set; } = string.Empty;
         public int Category_ID { get; set; }
         public decimal Price { get; set; }
         public int Stock_Quantity { get; set; }

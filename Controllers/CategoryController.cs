@@ -45,6 +45,20 @@ namespace ECSTASYJEWELS.Controllers
             }
         }
 
+        [HttpGet("GetFeaturedCategory")]
+        public async Task<ActionResult<IEnumerable<Category>>> GetFeaturedCategory()
+        {
+            try
+            {
+                var category = await _repository.GetFeatureCategoryProducts();
+                return Ok(category);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Internal server error
+            }
+        }
+
 
 
     }
