@@ -199,7 +199,7 @@ namespace ECSTASYJEWELS.Data
                      FROM Product_Images img 
                      WHERE img.Product_ID = prod.Product_ID AND img.Is_Primary = 1) AS Product_Image
                 FROM Products prod
-                WHERE Is_Active = 1 order by Total_Ratings desc";
+                WHERE Is_Active = 1  ";
 
                     // Initialize parameters
                     var parameters = new List<SqlParameter>();
@@ -293,7 +293,7 @@ namespace ECSTASYJEWELS.Data
 
 
                     // Order by Rating
-                    query += "ORDER BY Rating DESC;";
+                    query += " ORDER BY Rating DESC;";
 
 
                     // Prepare and execute the command
