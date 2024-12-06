@@ -33,7 +33,7 @@ namespace ECSTASYJEWELS
             }
         }
 
-        public async Task<User> Register(RegisterUserInfo user, string password)
+        public async Task<User> Register(User user)
         {
             try
             {
@@ -42,21 +42,35 @@ namespace ECSTASYJEWELS
                     await conn.OpenAsync();
 
                     // Generate password hash and salt
-                    CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+                    CreatePasswordHash(user.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-                    var command = new SqlCommand(
-                        "INSERT INTO [Users] (First_Name, Email, Phone_Number, Is_Active, Password_Hash, Password_Salt) " +
-                        "OUTPUT INSERTED.User_ID, INSERTED.First_Name, INSERTED.Email, INSERTED.Phone_Number " +
-                        "VALUES (@Name, @Email, @Phone_Number, @IsActive, @PasswordHash, @PasswordSalt)", conn);
+                    var checkCommand = new SqlCommand("SELECT COUNT(1) FROM [Users] WHERE Email = @Email", conn);
+                    checkCommand.Parameters.AddWithValue("@Email", user.Email);
 
-                    command.Parameters.AddWithValue("@Name", user.Name);
-                    command.Parameters.AddWithValue("@Email", user.Email);
-                    command.Parameters.AddWithValue("@Phone_Number", user.Phone_Number);
-                    command.Parameters.AddWithValue("@IsActive", true);
-                    command.Parameters.AddWithValue("@PasswordHash", passwordHash);
-                    command.Parameters.AddWithValue("@PasswordSalt", passwordSalt);
+                    var exists = (int)checkCommand.ExecuteScalar() > 0;
+                    if (exists)
+                    {
+                        throw new Exception("A user with this email already exists.");
+                    }
 
-                    using (var reader = await command.ExecuteReaderAsync())
+                    // Proceed with the insert if no duplicate is found
+                    var insertCommand = new SqlCommand(
+                        "INSERT INTO [Users] (First_Name, Email, Phone_Number, Is_Active, Password_Hash, Password_Salt, Email_Verified, Phone_Verified) " +
+                        "OUTPUT INSERTED.User_ID " +
+                        "VALUES (@Name, @Email, @Phone_Number, @IsActive, @PasswordHash, @PasswordSalt, @EmailVerified, @PhoneVerified)", conn);
+
+                    insertCommand.Parameters.AddWithValue("@Name", user.First_Name);
+                    insertCommand.Parameters.AddWithValue("@Email", user.Email);
+                    insertCommand.Parameters.AddWithValue("@Phone_Number", user.Phone_Number);
+                    insertCommand.Parameters.AddWithValue("@IsActive", true);
+                    insertCommand.Parameters.AddWithValue("@PasswordHash", passwordHash);
+                    insertCommand.Parameters.AddWithValue("@PasswordSalt", passwordSalt);
+                    insertCommand.Parameters.AddWithValue("@EmailVerified", user.Email_Verified ?? false);
+                    insertCommand.Parameters.AddWithValue("@PhoneVerified", user.Phone_Verified ?? false);
+
+                    insertCommand.ExecuteNonQuery();
+
+                    using (var reader = await insertCommand.ExecuteReaderAsync())
                     {
                         if (await reader.ReadAsync())
                         {
@@ -126,6 +140,7 @@ namespace ECSTASYJEWELS
             }
         }
 
+
         public async Task<IEnumerable<User>> GetUserInfo(decimal User_ID)
         {
             var items = new List<User>();
@@ -137,6 +152,49 @@ namespace ECSTASYJEWELS
                     var command = new SqlCommand("select User_ID,First_Name,Last_Name,Gender,Phone_Number,Phone_Verified,Email,Email_Verified from Users " +
                     "WHERE User_ID = @User_ID", conn);
                     command.Parameters.AddWithValue("@User_ID", User_ID);
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            items.Add(new User
+                            {
+                                User_ID = (int)reader["User_ID"],
+                                First_Name = reader["First_Name"].ToString() ?? "",
+                                Last_Name = reader["Last_Name"].ToString() ?? "",
+                                Gender = reader["Gender"].ToString() ?? "",
+                                Email = reader["Email"].ToString() ?? "",
+                                Email_Verified = (bool)reader["Email_Verified"],
+                                Phone_Number = reader["Phone_Number"].ToString() ?? "",
+                                Phone_Verified = (bool)reader["Phone_Verified"],
+                            });
+                        }
+                    }
+                }
+            }
+            catch (SqlException ex)
+            {
+                // Log exception (consider using a logging framework)
+                throw new Exception("Database error occurred while retrieving User Info." + ex);
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                throw new Exception("An error occurred while retrieving User Info." + ex);
+            }
+            return items;
+        }
+
+ public async Task<IEnumerable<User>> LoginByPhone(decimal Phone_Number)
+        {
+            var items = new List<User>();
+            try
+            {
+                using (var conn = new SqlConnection(_connectionString))
+                {
+                    await conn.OpenAsync();
+                    var command = new SqlCommand("select User_ID,First_Name,Last_Name,Gender,Phone_Number,Phone_Verified,Email,Email_Verified from Users " +
+                    "WHERE Phone_Number = @Phone_Number", conn);
+                    command.Parameters.AddWithValue("@Phone_Number", Phone_Number);
                     using (var reader = await command.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
@@ -221,12 +279,7 @@ namespace ECSTASYJEWELS
 
     }
 
-    public class RegisterUserInfo
-    {
-        public string Name { get; set; } = "";
-        public string Phone_Number { get; set; } = "";
-        public string Email { get; set; } = "";
-    }
+
     public class LoginUser
     {
         public string Email { get; set; } = "";

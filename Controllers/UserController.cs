@@ -51,16 +51,30 @@ namespace ECSTASYJEWELS.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterUserInfo registerUser, string password)
+        public async Task<IActionResult> Register(User registerUser)
         {
 
-            var user = await _repository.Register(registerUser, password);
+            var user = await _repository.Register(registerUser);
 
             if (user == null)
             {
                 return BadRequest("Not Registered");
             }
             return Ok(user);
+        }
+
+        [HttpGet("loginbyphone/{Phone_Number}")]
+        public async Task<ActionResult<IEnumerable<User>>> LoginByPhone(decimal Phone_Number)
+        {
+            try
+            {
+                var response = await _repository.LoginByPhone(Phone_Number);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message); // Internal server error
+            }
         }
 
         [HttpGet("{User_ID}")]
